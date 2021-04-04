@@ -1,32 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>BGP与邻居建立连接-基于RFC4271</title>
-    <url>/2021/04/04/BGP/BGP%E4%B8%8E%E9%82%BB%E5%B1%85%E5%BB%BA%E7%AB%8B%E8%BF%9E%E6%8E%A5-%E5%9F%BA%E4%BA%8ERFC4271/BGP%E4%B8%8E%E9%82%BB%E5%B1%85%E5%BB%BA%E7%AB%8B%E8%BF%9E%E6%8E%A5-%E5%9F%BA%E4%BA%8ERFC4271/</url>
-    <content><![CDATA[<h1 id="1-BGP的状态机"><a href="#1-BGP的状态机" class="headerlink" title="1 BGP的状态机"></a>1 BGP的状态机</h1><p>    BGP是根据状态机进行运转的，搞清楚了BGP的状态机，对BGP工作原理的理解会有帮助。<br>    限于篇幅，本文只讨论一切步骤都完美正常执行的情况（即收到的包都是正确的，与peer建立TCP连接一次成功等等）。当然RFC文档种还详细介绍了各种突发状况、各种处理方法等，实在是有点多，下篇文章再完整地叙述。</p>
-<span id="more"></span>
-
-<h2 id="1-1-Idle-state"><a href="#1-1-Idle-state" class="headerlink" title="1.1 Idle state"></a>1.1 Idle state</h2><p>    BGP协议为每一个peer(对等体)即邻居维护一个FSM。在配置BGP路由的时候，会经常见到这两个命令：<br>    router bgp asn<br>    该命令创建了一个bgp实例，还没有创建peer，FSM还没开始。<br>    另一个命令：<br>    <code>neighbor X.X.X.X remote-as asn</code><br>    neighbor命令执行后，bgp会为其创建一个peer，为其创建相应的FSM并开始运转，初始状态为Idle。<br>    Idle state不接受任何的TCP连接（比如别的BGP路由器要与其建立TCP连接）。可以认为，在Idle state的前半段，什么事都没干。当FSM捕获到一个ManualStart event或者AutomaticStart event时，开始进入Idle state的后半段。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">notes: </span><br><span class="line">    ManualStart event:当用neighbor指定一个邻居之后，就要跟邻居建立TCP连接；如果ManualStart &#x3D; TRUE,那么与邻居建立TCP连接的过程就需要另外手动输入命令。（根据自己理解猜测的，不保证完全正确，仅供参考）</span><br><span class="line">    AutomaticStart event:如果AutomaticStart &#x3D; TRUE,那么与邻居建立TCP连接的过程就可以自动进行，应该是在neighbor命令执行后等待短暂的时间后进行peer的TCP连接。</span><br></pre></td></tr></table></figure>
-
-<p>    捕获到一个ManualStart event或者AutomaticStart event时，Idle state的后半段开始了，后半段做的事主要有：<br>    （1）初始化BGP peer连接的资源（没咋懂）<br>    （2）初始化TCP 连接，说白了就是要开始与别的peer建立起TCP连接关系<br>    （3）监听TCP请求，可能是自己请求与别的peer建立TCP连接，也可能是别的peer请求与自己建立TCP连接关系<br>    （4）Set ConnectRetryCounter = 0<br>    （5）Starts the ConnectRetryTimer with the initial value<br>    （6）FSM开始转换状态，有Idle转为Connect（如果是ManualStart_with_PassiveTcpEstablishment event或者AutomaticStart_with_PassiveTcpEstablishment event则转为Active，这两个状态没有本质区别，先不管）</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">notes:</span><br><span class="line">    ConnectRetryCounter:表示尝试与peer建立TCP连接的次数，至于到达一定次数会怎么样，文档里我没找到</span><br><span class="line">    ConnectRetryTimer:定时器，即过多久尝试与peer建立TCP连接，RFC里建议的初始值为120s</span><br></pre></td></tr></table></figure>
-<p>    注意：Idle state的后半段并不保证TCP连接已经建立完成，即Idle state会进行与peer进行TCP连接这个动作，该TCP连接可以一次成功、可能尝试多次才成功也可能不成功。但是FSM可不等TCP连接建立成功了才转换到Connect state,即在Idle state后半段我发出了建立TCP连接这个指令，就转换到Connect state,不管TCP连接成没成功。</p>
-<h2 id="1-2-Connect-state"><a href="#1-2-Connect-state" class="headerlink" title="1.2 Connect state"></a>1.2 Connect state</h2><p>    当Idle state中的各个步骤都可以正确无误地执行后，就进入到了Connect state，在该状态又有其对应的一些事件及操作。<br>    Connect state在等待着TCP连接成功，如果TCP连接成功了（当然还有可能连接不成功和其他突发事件，这里不叙述），则会执行以下动作：<br>    （1）停止ConnectRetryTimer计时器<br>    （2）设置DelayOpenTimer为初始值<br>    （3）发送一个OPEN msg给peer（如果没设置DelayOpenTimer立马发送，有设置则等到时间到了再发送）<br>    （4）Sets the HoldTimer to a large value<br>    （5）改变状态到OpenSent state</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">notes:</span><br><span class="line">    DelayOpenTimer:又一个定时器，指当与peer成功建立TCP连接后是否要延迟发送OPEN msg</span><br><span class="line">    HoldTimer:指从对端peer收到一个KEEPALIVE&#x2F;UPDATE msg所需要的最长时间，RFC建议default value为 90 s、large value为 4 min</span><br></pre></td></tr></table></figure>
-
-<h2 id="1-3-OpenSent-state"><a href="#1-3-OpenSent-state" class="headerlink" title="1.3 OpenSent state"></a>1.3 OpenSent state</h2><p>    如果一切正常无error，那么就会从Connect state进入到OpenSent state。OpenSent state在等待着OPEN msg的到来，如果收到一个正确无误的OPEN msg后，则会进行：<br>    （1）Resets the DelayOpenTimer to zero（有什么用呢）<br>    （2）sets the BGP ConnectRetryTimer to zero<br>    （3）发送一个KEEPALIVE msg并启动KeepaliveTimer<br>    （4）转换状态至OpenConfirm</p>
-<h2 id="1-4-OpenConfirm-state"><a href="#1-4-OpenConfirm-state" class="headerlink" title="1.4 OpenConfirm state"></a>1.4 OpenConfirm state</h2><p>    因为已经发送了一个KEEPALIVE msg给对端peer，所以在OpenConfirm state在等待着对端peer发送一个KEEPALIVE/NOTIFICATION msg过来。如果正确地收到了一个KEEPALIVE msg，则：<br>    （1）重启HoldTimer<br>    （2）转换状态至Established state</p>
-<h2 id="1-5-Established-state"><a href="#1-5-Established-state" class="headerlink" title="1.5 Established state"></a>1.5 Established state</h2><p>    Established state可以说是BGP正常工作的最后一种状态了，进入了该状态BGP peer之间可以进行发送/接收UPDATE/NOTIFICATION/KEEPALIVE msg，也就是可以正常地交换更新网络中的路由信息了。<br>    若收到一个KEEPALIVE msg则：<br>    （1）重置HoldTimer定时器<br>    （2）状态仍是Established state<br>    若收到一个UPDATE msg，则：<br>    （1）处理UPDATE msg<br>    （2）重置HoldTimer定时器<br>    （3）状态仍是Established state</p>
-]]></content>
-      <categories>
-        <category>BGP</category>
-      </categories>
-      <tags>
-        <tag>BGP</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Hexo+theme-next+github page搭建blog</title>
     <url>/2021/04/04/hexo/hexo-and-theme-next-and-github-page-build-blog/hexo-and-theme-next-and-github-page-build-blog/</url>
     <content><![CDATA[<p>本文主要介绍win10下利用Hexo+theme-next+github page搭建个人博客。其中，<a href="https://github.com/next-theme/hexo-theme-next">theme-next</a>是一款简洁而又功能强大的Hexo主题。</p>
@@ -90,6 +64,32 @@
       </categories>
       <tags>
         <tag>hexo</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>BGP与邻居建立连接-基于RFC4271</title>
+    <url>/2021/04/04/BGP/BGP%E4%B8%8E%E9%82%BB%E5%B1%85%E5%BB%BA%E7%AB%8B%E8%BF%9E%E6%8E%A5-%E5%9F%BA%E4%BA%8ERFC4271/BGP%E4%B8%8E%E9%82%BB%E5%B1%85%E5%BB%BA%E7%AB%8B%E8%BF%9E%E6%8E%A5-%E5%9F%BA%E4%BA%8ERFC4271/</url>
+    <content><![CDATA[<h1 id="1-BGP的状态机"><a href="#1-BGP的状态机" class="headerlink" title="1 BGP的状态机"></a>1 BGP的状态机</h1><p>    BGP是根据状态机进行运转的，搞清楚了BGP的状态机，对BGP工作原理的理解会有帮助。<br>    限于篇幅，本文只讨论一切步骤都完美正常执行的情况（即收到的包都是正确的，与peer建立TCP连接一次成功等等）。当然RFC文档种还详细介绍了各种突发状况、各种处理方法等，实在是有点多，下篇文章再完整地叙述。</p>
+<span id="more"></span>
+
+<h2 id="1-1-Idle-state"><a href="#1-1-Idle-state" class="headerlink" title="1.1 Idle state"></a>1.1 Idle state</h2><p>    BGP协议为每一个peer(对等体)即邻居维护一个FSM。在配置BGP路由的时候，会经常见到这两个命令：<br>    router bgp asn<br>    该命令创建了一个bgp实例，还没有创建peer，FSM还没开始。<br>    另一个命令：<br>    <code>neighbor X.X.X.X remote-as asn</code><br>    neighbor命令执行后，bgp会为其创建一个peer，为其创建相应的FSM并开始运转，初始状态为Idle。<br>    Idle state不接受任何的TCP连接（比如别的BGP路由器要与其建立TCP连接）。可以认为，在Idle state的前半段，什么事都没干。当FSM捕获到一个ManualStart event或者AutomaticStart event时，开始进入Idle state的后半段。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">notes: </span><br><span class="line">    ManualStart event:当用neighbor指定一个邻居之后，就要跟邻居建立TCP连接；如果ManualStart &#x3D; TRUE,那么与邻居建立TCP连接的过程就需要另外手动输入命令。（根据自己理解猜测的，不保证完全正确，仅供参考）</span><br><span class="line">    AutomaticStart event:如果AutomaticStart &#x3D; TRUE,那么与邻居建立TCP连接的过程就可以自动进行，应该是在neighbor命令执行后等待短暂的时间后进行peer的TCP连接。</span><br></pre></td></tr></table></figure>
+
+<p>    捕获到一个ManualStart event或者AutomaticStart event时，Idle state的后半段开始了，后半段做的事主要有：<br>    （1）初始化BGP peer连接的资源（没咋懂）<br>    （2）初始化TCP 连接，说白了就是要开始与别的peer建立起TCP连接关系<br>    （3）监听TCP请求，可能是自己请求与别的peer建立TCP连接，也可能是别的peer请求与自己建立TCP连接关系<br>    （4）Set ConnectRetryCounter = 0<br>    （5）Starts the ConnectRetryTimer with the initial value<br>    （6）FSM开始转换状态，有Idle转为Connect（如果是ManualStart_with_PassiveTcpEstablishment event或者AutomaticStart_with_PassiveTcpEstablishment event则转为Active，这两个状态没有本质区别，先不管）</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">notes:</span><br><span class="line">    ConnectRetryCounter:表示尝试与peer建立TCP连接的次数，至于到达一定次数会怎么样，文档里我没找到</span><br><span class="line">    ConnectRetryTimer:定时器，即过多久尝试与peer建立TCP连接，RFC里建议的初始值为120s</span><br></pre></td></tr></table></figure>
+<p>    注意：Idle state的后半段并不保证TCP连接已经建立完成，即Idle state会进行与peer进行TCP连接这个动作，该TCP连接可以一次成功、可能尝试多次才成功也可能不成功。但是FSM可不等TCP连接建立成功了才转换到Connect state,即在Idle state后半段我发出了建立TCP连接这个指令，就转换到Connect state,不管TCP连接成没成功。</p>
+<h2 id="1-2-Connect-state"><a href="#1-2-Connect-state" class="headerlink" title="1.2 Connect state"></a>1.2 Connect state</h2><p>    当Idle state中的各个步骤都可以正确无误地执行后，就进入到了Connect state，在该状态又有其对应的一些事件及操作。<br>    Connect state在等待着TCP连接成功，如果TCP连接成功了（当然还有可能连接不成功和其他突发事件，这里不叙述），则会执行以下动作：<br>    （1）停止ConnectRetryTimer计时器<br>    （2）设置DelayOpenTimer为初始值<br>    （3）发送一个OPEN msg给peer（如果没设置DelayOpenTimer立马发送，有设置则等到时间到了再发送）<br>    （4）Sets the HoldTimer to a large value<br>    （5）改变状态到OpenSent state</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">notes:</span><br><span class="line">    DelayOpenTimer:又一个定时器，指当与peer成功建立TCP连接后是否要延迟发送OPEN msg</span><br><span class="line">    HoldTimer:指从对端peer收到一个KEEPALIVE&#x2F;UPDATE msg所需要的最长时间，RFC建议default value为 90 s、large value为 4 min</span><br></pre></td></tr></table></figure>
+
+<h2 id="1-3-OpenSent-state"><a href="#1-3-OpenSent-state" class="headerlink" title="1.3 OpenSent state"></a>1.3 OpenSent state</h2><p>    如果一切正常无error，那么就会从Connect state进入到OpenSent state。OpenSent state在等待着OPEN msg的到来，如果收到一个正确无误的OPEN msg后，则会进行：<br>    （1）Resets the DelayOpenTimer to zero（有什么用呢）<br>    （2）sets the BGP ConnectRetryTimer to zero<br>    （3）发送一个KEEPALIVE msg并启动KeepaliveTimer<br>    （4）转换状态至OpenConfirm</p>
+<h2 id="1-4-OpenConfirm-state"><a href="#1-4-OpenConfirm-state" class="headerlink" title="1.4 OpenConfirm state"></a>1.4 OpenConfirm state</h2><p>    因为已经发送了一个KEEPALIVE msg给对端peer，所以在OpenConfirm state在等待着对端peer发送一个KEEPALIVE/NOTIFICATION msg过来。如果正确地收到了一个KEEPALIVE msg，则：<br>    （1）重启HoldTimer<br>    （2）转换状态至Established state</p>
+<h2 id="1-5-Established-state"><a href="#1-5-Established-state" class="headerlink" title="1.5 Established state"></a>1.5 Established state</h2><p>    Established state可以说是BGP正常工作的最后一种状态了，进入了该状态BGP peer之间可以进行发送/接收UPDATE/NOTIFICATION/KEEPALIVE msg，也就是可以正常地交换更新网络中的路由信息了。<br>    若收到一个KEEPALIVE msg则：<br>    （1）重置HoldTimer定时器<br>    （2）状态仍是Established state<br>    若收到一个UPDATE msg，则：<br>    （1）处理UPDATE msg<br>    （2）重置HoldTimer定时器<br>    （3）状态仍是Established state</p>
+]]></content>
+      <categories>
+        <category>BGP</category>
+      </categories>
+      <tags>
+        <tag>BGP</tag>
       </tags>
   </entry>
 </search>
