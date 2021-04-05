@@ -296,7 +296,7 @@
         <i class="far fa-file-word"></i>
       </span>
       <span class="post-meta-item-text">本文字数：</span>
-      <span>5.9k</span>
+      <span>6k</span>
     </span>
     <span class="post-meta-item" title="阅读时长">
       <span class="post-meta-item-icon">
@@ -558,9 +558,14 @@
                 console.error('Failed to save visitor count', error);
               });
           } else {
-              leancloudSelector(url).innerText = 'Counter not initialized! More info at console err msg.';
-              console.error('ATTENTION! LeanCloud counter has security bug, see how to solve it here: https://github.com/theme-next/hexo-leancloud-counter-security. \n However, you can still use LeanCloud without security, by setting `security` option to `false`.');
-            
+              Counter('post', '/classes/Counter', { title, url, time: 1 })
+                .then(response => response.json())
+                .then(() => {
+                  leancloudSelector(url).innerText = 1;
+                })
+                .catch(error => {
+                  console.error('Failed to create', error);
+                });
           }
         })
         .catch(error => {
@@ -587,7 +592,7 @@
         });
     }
 
-    const { app_id, app_key, server_url } = {"enable":true,"app_id":"h6yIu8MUC89GWMVIOaUMgO0P-gzGzoHsz","app_key":"yl6rgok346LtGkr96WBCNwSL","server_url":null,"security":true,"visitor":true};
+    const { app_id, app_key, server_url } = {"enable":true,"app_id":"h6yIu8MUC89GWMVIOaUMgO0P-gzGzoHsz","app_key":"yl6rgok346LtGkr96WBCNwSL","server_url":null,"security":false,"visitor":true};
     function fetchData(api_server) {
       const Counter = (method, url, data) => {
         return fetch(`${api_server}/1.1${url}`, {
