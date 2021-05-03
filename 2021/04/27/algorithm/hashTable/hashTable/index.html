@@ -24,16 +24,23 @@
     var NexT = window.NexT || {};
     var CONFIG = {"hostname":"example.com","root":"/","images":"/images","scheme":"Pisces","version":"8.3.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
   </script>
-<meta property="og:type" content="website">
-<meta property="og:title" content="Linfs&#39;s blog">
-<meta property="og:url" content="http://example.com/categories/centralized-routing/index.html">
+<meta name="description" content="1 前言散列表(hash table)的出现是为了提高存储数据的访问速度，当数据采用数组或者链表进行存储时，要查找一个元素必须进行遍历(当然采用其他技术如时无需遍历)，当数据量大时耗时巨大；而散列表根据元素的key可快速计算出元素所在位置，无需进行遍历，进而大大提高了数据的访问速度。 散列表的元素以键值(key-value)的形式存储。一般会有一块空间用于存储散列表的数据元素，基于元素的key根据">
+<meta property="og:type" content="article">
+<meta property="og:title" content="散列表">
+<meta property="og:url" content="http://example.com/2021/04/27/algorithm/hashTable/hashTable/index.html">
 <meta property="og:site_name" content="Linfs&#39;s blog">
+<meta property="og:description" content="1 前言散列表(hash table)的出现是为了提高存储数据的访问速度，当数据采用数组或者链表进行存储时，要查找一个元素必须进行遍历(当然采用其他技术如时无需遍历)，当数据量大时耗时巨大；而散列表根据元素的key可快速计算出元素所在位置，无需进行遍历，进而大大提高了数据的访问速度。 散列表的元素以键值(key-value)的形式存储。一般会有一块空间用于存储散列表的数据元素，基于元素的key根据">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://www.kukuxiaai.com/blog/2019-07/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95-%E6%95%A3%E5%88%97%E8%A1%A8/">
+<meta property="article:published_time" content="2021-04-27T01:57:35.000Z">
+<meta property="article:modified_time" content="2021-05-02T01:05:13.528Z">
 <meta property="article:author" content="Linfs">
+<meta property="article:tag" content="algorithm">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://www.kukuxiaai.com/blog/2019-07/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95-%E6%95%A3%E5%88%97%E8%A1%A8/">
 
 
-<link rel="canonical" href="http://example.com/categories/centralized-routing/">
+<link rel="canonical" href="http://example.com/2021/04/27/algorithm/hashTable/hashTable/">
 
 
 <script class="page-configurations">
@@ -41,11 +48,11 @@
   CONFIG.page = {
     sidebar: "",
     isHome : false,
-    isPost : false,
+    isPost : true,
     lang   : 'zh-CN'
   };
 </script>
-<title>分类: centralized routing | Linfs's blog</title>
+<title>散列表 | Linfs's blog</title>
   
 
 
@@ -170,7 +177,7 @@
 
   <aside class="sidebar">
 
-    <div class="sidebar-inner sidebar-overview-active">
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
       <ul class="sidebar-nav">
         <li class="sidebar-nav-toc">
           文章目录
@@ -183,6 +190,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-%E5%89%8D%E8%A8%80"><span class="nav-text">1 前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-%E7%9B%B4%E6%8E%A5%E5%AF%BB%E5%9D%80%E8%A1%A8"><span class="nav-text">2 直接寻址表</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-%E6%95%A3%E5%88%97%E8%A1%A8"><span class="nav-text">3 散列表</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#3-1-%E6%8F%8F%E8%BF%B0"><span class="nav-text">3.1 描述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-2-%E5%A4%84%E7%90%86%E5%86%B2%E7%AA%81"><span class="nav-text">3.2 处理冲突</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-1-%E9%93%BE%E6%8E%A5%E6%B3%95"><span class="nav-text">3.2.1 链接法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-1-1-%E6%8F%8F%E8%BF%B0"><span class="nav-text">3.2.1.1 描述</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-1-2-%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90"><span class="nav-text">3.2.1.2 性能分析</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#3-2-1-2-1-%E6%9F%A5%E6%89%BE"><span class="nav-text">3.2.1.2.1 查找</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-2-%E5%BC%80%E6%94%BE%E5%AF%BB%E5%9D%80%E6%B3%95"><span class="nav-text">3.2.2 开放寻址法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-2-1-%E6%8F%8F%E8%BF%B0"><span class="nav-text">3.2.2.1 描述</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-2-2-%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90"><span class="nav-text">3.2.2.2 性能分析</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-3-%E6%95%A3%E5%88%97%E5%87%BD%E6%95%B0"><span class="nav-text">3.3 散列函数</span></a></li></ol></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -238,50 +246,129 @@
 </noscript>
 
 
-    <div class="main-inner category posts-collapse">
+    <div class="main-inner post posts-expand">
 
 
   
-  
-  
-  <div class="post-block">
-    <div class="post-content">
-      <div class="collection-title">
-        <h2 class="collection-header">centralized routing
-          <small>分类</small>
-        </h2>
-      </div>
 
-      
-    <div class="collection-year">
-      <span class="collection-header">2021</span>
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/04/27/algorithm/hashTable/hashTable/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/cattle.jpg">
+      <meta itemprop="name" content="Linfs">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Linfs's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          散列表
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-04-27 09:57:35" itemprop="dateCreated datePublished" datetime="2021-04-27T09:57:35+08:00">2021-04-27</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/algorithm/" itemprop="url" rel="index"><span itemprop="name">algorithm</span></a>
+        </span>
+    </span>
+
+  
+    <span id="/2021/04/27/algorithm/hashTable/hashTable/" class="post-meta-item leancloud_visitors" data-flag-title="散列表" title="阅读次数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span class="leancloud-visitors-count"></span>
+    </span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>1.3k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>1 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="1-前言"><a href="#1-前言" class="headerlink" title="1 前言"></a>1 前言</h1><p>散列表(<code>hash table</code>)的出现是为了提高存储数据的访问速度，当数据采用数组或者链表进行存储时，要查找一个元素必须进行遍历(当然采用其他技术如<img src="" alt="二叉搜索树">时无需遍历)，当数据量大时耗时巨大；而散列表根据元素的<code>key</code>可快速计算出元素所在位置，无需进行遍历，进而大大提高了数据的访问速度。</p>
+<p>散列表的元素以键值(<code>key-value</code>)的形式存储。一般会有一块空间用于存储散列表的数据元素，基于元素的<code>key</code>根据一定的规则计算出该元素应该存放的位置并进行存储；因为关键字为<code>key</code>的元素所在的位置可以通过计算快速计算得到，因此可以实现快速访问。</p>
+<h1 id="2-直接寻址表"><a href="#2-直接寻址表" class="headerlink" title="2 直接寻址表"></a>2 直接寻址表</h1><p>假设数据元素的关键字<code>key</code>的值取自全域*<code>U=&#123;0, 1, 2, ..., m-1&#125;</code><em>，在直接寻址表(<code>direct-address table</code>)中一般会有一个大小为<code>m</code>的数组，以保证任意元素在直接寻址表中都会有一个位置(或成为槽<code>slot</code>)。在直接寻址表中，数组的下标即为元素的<code>key</code>，因此可根据<code>key</code>快速定位数组中的元素，且对所有的数据元素查找时间恒为</em><code>O(1)</code>*。</p>
+<p>直接寻址表原理简单，实现也不复杂，但当<code>key</code>的全域*<code>U</code><em>很大但实际上需要存储的数据元素不多时，会造成空间的浪费：比如全域</em><code>U</code><em>的取值范围为<code>0 ~ 9999</code>，但数据元素的个数只有<code>100</code>个，根据直接寻址表的套路，其会申请一个大小为<code>10000</code>的数组，在这种情况下，数组的<code>9900</code>个元素空间就浪费了。因而直接寻址表比较适合全域</em><code>U</code>*范围比较小的情况。</p>
+<p>***Note:***直接寻址表并不是散列表的一种，即直接寻址表和散列表是并列关系而非从属关系(有待考证)。</p>
+<h1 id="3-散列表"><a href="#3-散列表" class="headerlink" title="3 散列表"></a>3 散列表</h1><h2 id="3-1-描述"><a href="#3-1-描述" class="headerlink" title="3.1 描述"></a>3.1 描述</h2><p>由于直接寻址表存在以下几个问题：<code>1)</code>当<code>key</code>的全域*<code>U</code><em>的取值范围<code>0 ~ m</code>很大时，要存储一张大小为<code>m</code>的直接寻址表<code>T</code>可能不切实际；<code>2)</code>待存储的元素个数<code>k</code>可能不多，而<code>key</code>的全域</em><code>U</code>*的取值范围<code>0 ~ m</code>可能很大，这种情况下采用直接寻址表的方式存储性价比低，因为会浪费大量的存储空间。</p>
+<p>相对于直接寻址表，散列表：<code>1)</code>多了一个散列函数(<code>hash function</code>)<code>h(x)</code>，散列函数以元素的<code>key</code>为输入，输出元素存放位置；<code>2)</code>直接寻址表把具有关键字<code>k</code>的元素存放在槽<code>k</code>中，而散列表把它存放在<code>h(k)</code>中，即散列表通过散列函数<code>h(x)</code>把元素映射到散列表*<code>T[0 1, 2 ..., n-1]</code><em>的各个槽(<code>slot</code>)中，因为散列表的映射位置是根据映射函数<code>h(x)</code>计算的，因而散列表的大小<code>n</code>可比全域</em><code>U</code><em>的大小<code>m</code>小得多，而直接寻址表的大小必须和全域</em><code>U</code>*的大小一样大。</p>
+<p>散列表的大小<code>n</code>比*<code>U</code>*的大小<code>m</code>要小，把<code>m</code>个数存入<code>n</code>个槽中(<code>n&lt;=m</code>)，那必然存在<code>2</code>个或多个元素映射到同一个槽中，这就产生了冲突(<code>collision</code>)，因此散列表需要有额外的方式处理冲突，主要有<code>2</code>种：链接法(<code>chaining</code>)和开放寻址法(<code>open addressing</code>)。</p>
+<h2 id="3-2-处理冲突"><a href="#3-2-处理冲突" class="headerlink" title="3.2 处理冲突"></a>3.2 处理冲突</h2><h3 id="3-2-1-链接法"><a href="#3-2-1-链接法" class="headerlink" title="3.2.1 链接法"></a>3.2.1 链接法</h3><h4 id="3-2-1-1-描述"><a href="#3-2-1-1-描述" class="headerlink" title="3.2.1.1 描述"></a>3.2.1.1 描述</h4><p>链接法中散列表存储的是一个指向某个链表的指针，当产生冲突时，直接把数据元素追加到链表的末尾。</p>
+<h4 id="3-2-1-2-性能分析"><a href="#3-2-1-2-性能分析" class="headerlink" title="3.2.1.2 性能分析"></a>3.2.1.2 性能分析</h4><p>看不懂《算法导论》里写的意思，TBC.</p>
+<h5 id="3-2-1-2-1-查找"><a href="#3-2-1-2-1-查找" class="headerlink" title="3.2.1.2.1 查找"></a>3.2.1.2.1 查找</h5><h3 id="3-2-2-开放寻址法"><a href="#3-2-2-开放寻址法" class="headerlink" title="3.2.2 开放寻址法"></a>3.2.2 开放寻址法</h3><h4 id="3-2-2-1-描述"><a href="#3-2-2-1-描述" class="headerlink" title="3.2.2.1 描述"></a>3.2.2.1 描述</h4><h4 id="3-2-2-2-性能分析"><a href="#3-2-2-2-性能分析" class="headerlink" title="3.2.2.2 性能分析"></a>3.2.2.2 性能分析</h4><h2 id="3-3-散列函数"><a href="#3-3-散列函数" class="headerlink" title="3.3 散列函数"></a>3.3 散列函数</h2><p><img src="https://www.kukuxiaai.com/blog/2019-07/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95-%E6%95%A3%E5%88%97%E8%A1%A8/" alt="KuKuXia的散列表介绍"></p>
+
     </div>
 
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-      <div class="post-meta-container">
-        <time itemprop="dateCreated"
-              datetime="2021-04-11T20:39:43+08:00"
-              content="2021-04-11">
-          04-11
-        </time>
-      </div>
+    
+    
+    
 
-      <div class="post-title">
-          <a class="post-title-link" href="/2021/04/11/interview/Primus/Primus/" itemprop="url">
-            <span itemprop="name">Primus</span>
-          </a>
-      </div>
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/algorithm/" rel="tag"># algorithm</a>
+          </div>
 
-      
-    </header>
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2021/04/26/algorithm/sort/sort/" rel="prev" title="排序算法">
+                  <i class="fa fa-chevron-left"></i> 排序算法
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2021/04/27/algorithm/binarySearchTree/binarySearchTree/" rel="next" title="post">
+                  post <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
   </article>
+</div>
 
-    </div>
-  </div>
-  
-  
-  
+
+
+
+
 
 
 <script>

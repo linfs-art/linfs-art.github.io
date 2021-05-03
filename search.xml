@@ -27,6 +27,37 @@
       </tags>
   </entry>
   <entry>
+    <title>openflow switch简介</title>
+    <url>/2021/04/18/SDN/openflow/openflow/</url>
+    <content><![CDATA[<h1 id="1-openflow-switch"><a href="#1-openflow-switch" class="headerlink" title="1 openflow switch"></a>1 openflow switch</h1><p><code>openflow switch</code>指的是支持<code>openflow protocol</code>的交换机。如<code>图1</code>所示，<code>openflow switch</code>的组成主要有：1个/多个<code>flow table</code>和1个<code>group table</code>、1个或多个<code>openflow channel</code>。<code>openflow switch</code>基于<code>openflow protocol</code>通过<code>openflow channel</code>和远程的<code>controller</code>进行通信。</p>
+<p><img src="/images/SDN/openflowSwitch/openflowSwitch.png" alt="openflowSwitch"></p>
+<center>
+    <b>
+    图1 openflow switch
+    </b>
+</center>
+
+<h1 id="2-openflow-protocol"><a href="#2-openflow-protocol" class="headerlink" title="2 openflow protocol"></a>2 openflow protocol</h1>]]></content>
+      <categories>
+        <category>SDN</category>
+      </categories>
+      <tags>
+        <tag>SDN</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>open vSwitch简介</title>
+    <url>/2021/04/18/SDN/openvSwitch/openvSwitch/</url>
+    <content><![CDATA[<h1 id="1-open-vSwitch"><a href="#1-open-vSwitch" class="headerlink" title="1 open vSwitch"></a>1 open vSwitch</h1><p><code>open vSwitch</code>是一款基于<code>openflow</code>协议的开源虚拟交换机。</p>
+<h1 id="2-open-vSwitch架构"><a href="#2-open-vSwitch架构" class="headerlink" title="2 open vSwitch架构"></a>2 open vSwitch架构</h1>]]></content>
+      <categories>
+        <category>SDN</category>
+      </categories>
+      <tags>
+        <tag>SDN</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Hexo+theme-next+github page搭建blog</title>
     <url>/2021/04/04/hexo/hexo-and-theme-next-and-github-page-build-blog/hexo-and-theme-next-and-github-page-build-blog/</url>
     <content><![CDATA[<p>本文主要介绍win10下利用Hexo+theme-next+github page搭建个人博客。其中，<a href="https://github.com/next-theme/hexo-theme-next">theme-next</a>是一款简洁而又功能强大的Hexo主题。</p>
@@ -86,6 +117,16 @@
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># Security</span><br><span class="line">encrypt:</span><br><span class="line">    enable: true</span><br><span class="line">    abstract: 有东西被加密了, 请输入密码查看.</span><br><span class="line">    message: 您好, 这里需要密码.</span><br><span class="line">    theme: shrink</span><br><span class="line">    wrong_pass_message: 抱歉, 这个密码看着不太对, 请再试试.</span><br><span class="line">    wrong_hash_message: 抱歉, 这个文章不能被校验, 不过您还是能看看解密后的内容.</span><br></pre></td></tr></table></figure>
 <p>（3）在需要加密的文章里添加<code>password</code>字段，例子如下：</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">title: Blog encrypt test</span><br><span class="line">date: 2021-04-10 13:21:00</span><br><span class="line">categories: Blog encrypt test</span><br><span class="line">tags: Blog encrypt test</span><br><span class="line">password: **********</span><br><span class="line">abstract: Welcome to my blog, enter password to read.</span><br><span class="line">message: Welcome to my blog, enter password to read.</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-4-3-取消theme-next主题目录自动编号"><a href="#2-4-3-取消theme-next主题目录自动编号" class="headerlink" title="2.4.3 取消theme-next主题目录自动编号"></a>2.4.3 取消<code>theme-next</code>主题目录自动编号</h3><p>在<code>theme-next</code>主题中，在左侧栏<code>文章目录</code>中会为标题自动编号，如果在文章中也想显示目录的序号，那么在<code>文章目录</code>中的标题编号就会重复，如下图所示：</p>
+<p><img src="/images/hexo/hexo-and-theme-next-and-github-page-build-blog/theme-next%E7%9B%AE%E5%BD%95%E8%87%AA%E5%8A%A8%E7%BC%96%E5%8F%B7.png" alt="theme-next目录自动编号"></p>
+<p>如果希望在文章中显示标题编号，同时想让<code>文章目录</code>也好看一点，那就取消<code>theme-next</code>的目录自动编号，即修改主题配置文件<code>_config.next.yml</code>的<code>number</code>属性为<code>false</code>：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># Table of Contents in the Sidebar</span><br><span class="line"># Front-matter variable (unsupport wrap expand_all).</span><br><span class="line">toc:</span><br><span class="line">  enable: true</span><br><span class="line">  # Automatically add list number to toc.</span><br><span class="line">  number: false</span><br></pre></td></tr></table></figure>
+
+<p>效果如下：</p>
+<p><img src="/images/hexo/hexo-and-theme-next-and-github-page-build-blog/theme-next%E5%8F%96%E6%B6%88%E7%9B%AE%E5%BD%95%E8%87%AA%E5%8A%A8%E7%BC%96%E5%8F%B7.png" alt="theme-next取消目录自动编号"></p>
+<h3 id="2-4-4-图片点击放大功能"><a href="#2-4-4-图片点击放大功能" class="headerlink" title="2.4.4 图片点击放大功能"></a>2.4.4 图片点击放大功能</h3><p>如果在文章中插入图片，由于某些原因图片可能看不清，此时就需要点击放大预览功能，在<code>theme-next</code>中已经内置了<code>fancybox</code>，在<code>_config.next.yml</code>中把<code>fancybox</code>置为<code>true</code>即可：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># FancyBox is a tool that offers a nice and elegant way to add zooming functionality for images.</span><br><span class="line"># For more information: https:&#x2F;&#x2F;fancyapps.com&#x2F;fancybox&#x2F;</span><br><span class="line">fancybox: true</span><br></pre></td></tr></table></figure>
 
 <h1 id="3-本地-amp-github-page部署"><a href="#3-本地-amp-github-page部署" class="headerlink" title="3 本地&amp;github page部署"></a>3 本地&amp;github page部署</h1><h2 id="3-1-本地部署"><a href="#3-1-本地部署" class="headerlink" title="3.1 本地部署"></a>3.1 本地部署</h2><p>（1）<code>hexo g</code>可生成静态文件（生成到<code>/public</code>目录下）；<br>（2）<code>hexo clean</code>清理（即删除<code>/public</code>目录）；<br>（3）<code>hexo s</code>可在本地启动，浏览器输入<code>localhost:4000</code>可访问博客。</p>
 <h2 id="3-2-github-page部署"><a href="#3-2-github-page部署" class="headerlink" title="3.2 github page部署"></a>3.2 github page部署</h2><p>直接执行<code>hexo d</code>即可部署到github上。</p>
@@ -164,5 +205,61 @@
       <tags>
         <tag>interview</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>排序算法</title>
+    <url>/2021/04/26/algorithm/sort/sort/</url>
+    <content><![CDATA[<h1 id="1-插入排序"><a href="#1-插入排序" class="headerlink" title="1 插入排序"></a>1 插入排序</h1><h2 id="1-1-描述"><a href="#1-1-描述" class="headerlink" title="1.1 描述"></a>1.1 描述</h2><p>插入排序从无序序列中取一个元素，并插入到有序序列中，直到无序序列为空，此时插入排序完成。排序开始时，待排序序列中第1个元素为有序序列，第2个元素及后面的所有元素组成的序列为无序序列，插入排序把无序序列中的元素依次插入到前面的有序序列即可。</p>
+<h2 id="1-2-复杂度分析"><a href="#1-2-复杂度分析" class="headerlink" title="1.2 复杂度分析"></a>1.2 复杂度分析</h2><h3 id="1-2-1-时间复杂度"><a href="#1-2-1-时间复杂度" class="headerlink" title="1.2.1 时间复杂度"></a>1.2.1 时间复杂度</h3><p>***Note:***假设无序序列需要升序排列。<br><strong>最好的情况：</strong>待排序序列为升序序列，此时只需要进行<code>n-1</code>次比较，而不需要进行元素的移动，时间复杂度为<code>*O(n)*</code>。<br><strong>最坏的情况：</strong>待排序序列为降序序列，此时需要需要与前面有序序列的所有元素进行比较并移动，时间复杂度为<code>*O($n+n^2$)*</code>。</p>
+<h3 id="1-2-2-空间复杂度"><a href="#1-2-2-空间复杂度" class="headerlink" title="1.2.2 空间复杂度"></a>1.2.2 空间复杂度</h3><p>由插入排序的原理可知，其只需要额外保存一个待排序的元素，因此空间复杂度为常数复杂度<code>*O(1)*</code>。</p>
+<h2 id="1-3-代码实现"><a href="#1-3-代码实现" class="headerlink" title="1.3 代码实现"></a>1.3 代码实现</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">TBC.</span><br></pre></td></tr></table></figure>
+
+<h1 id="2-快速排序"><a href="#2-快速排序" class="headerlink" title="2 快速排序"></a>2 快速排序</h1><h2 id="2-1-描述"><a href="#2-1-描述" class="headerlink" title="2.1 描述"></a>2.1 描述</h2><h2 id="2-2-复杂度分析"><a href="#2-2-复杂度分析" class="headerlink" title="2.2 复杂度分析"></a>2.2 复杂度分析</h2><h3 id="2-2-1-时间复杂度"><a href="#2-2-1-时间复杂度" class="headerlink" title="2.2.1 时间复杂度"></a>2.2.1 时间复杂度</h3><h3 id="2-2-2-空间复杂度"><a href="#2-2-2-空间复杂度" class="headerlink" title="2.2.2 空间复杂度"></a>2.2.2 空间复杂度</h3><h2 id="2-3-代码实现"><a href="#2-3-代码实现" class="headerlink" title="2.3 代码实现"></a>2.3 代码实现</h2><!-- template -->
+<!-- 
+# 1 插入排序
+
+## 1.1 描述
+
+## 1.2 复杂度分析
+
+### 1.2.1 时间复杂度
+
+### 1.2.2 空间复杂度
+
+## 1.3 代码实现 -->
+]]></content>
+      <categories>
+        <category>algorithm</category>
+      </categories>
+      <tags>
+        <tag>algorithm</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>散列表</title>
+    <url>/2021/04/27/algorithm/hashTable/hashTable/</url>
+    <content><![CDATA[<h1 id="1-前言"><a href="#1-前言" class="headerlink" title="1 前言"></a>1 前言</h1><p>散列表(<code>hash table</code>)的出现是为了提高存储数据的访问速度，当数据采用数组或者链表进行存储时，要查找一个元素必须进行遍历(当然采用其他技术如<img src="" alt="二叉搜索树">时无需遍历)，当数据量大时耗时巨大；而散列表根据元素的<code>key</code>可快速计算出元素所在位置，无需进行遍历，进而大大提高了数据的访问速度。</p>
+<p>散列表的元素以键值(<code>key-value</code>)的形式存储。一般会有一块空间用于存储散列表的数据元素，基于元素的<code>key</code>根据一定的规则计算出该元素应该存放的位置并进行存储；因为关键字为<code>key</code>的元素所在的位置可以通过计算快速计算得到，因此可以实现快速访问。</p>
+<h1 id="2-直接寻址表"><a href="#2-直接寻址表" class="headerlink" title="2 直接寻址表"></a>2 直接寻址表</h1><p>假设数据元素的关键字<code>key</code>的值取自全域*<code>U=&#123;0, 1, 2, ..., m-1&#125;</code><em>，在直接寻址表(<code>direct-address table</code>)中一般会有一个大小为<code>m</code>的数组，以保证任意元素在直接寻址表中都会有一个位置(或成为槽<code>slot</code>)。在直接寻址表中，数组的下标即为元素的<code>key</code>，因此可根据<code>key</code>快速定位数组中的元素，且对所有的数据元素查找时间恒为</em><code>O(1)</code>*。</p>
+<p>直接寻址表原理简单，实现也不复杂，但当<code>key</code>的全域*<code>U</code><em>很大但实际上需要存储的数据元素不多时，会造成空间的浪费：比如全域</em><code>U</code><em>的取值范围为<code>0 ~ 9999</code>，但数据元素的个数只有<code>100</code>个，根据直接寻址表的套路，其会申请一个大小为<code>10000</code>的数组，在这种情况下，数组的<code>9900</code>个元素空间就浪费了。因而直接寻址表比较适合全域</em><code>U</code>*范围比较小的情况。</p>
+<p>***Note:***直接寻址表并不是散列表的一种，即直接寻址表和散列表是并列关系而非从属关系(有待考证)。</p>
+<h1 id="3-散列表"><a href="#3-散列表" class="headerlink" title="3 散列表"></a>3 散列表</h1><h2 id="3-1-描述"><a href="#3-1-描述" class="headerlink" title="3.1 描述"></a>3.1 描述</h2><p>由于直接寻址表存在以下几个问题：<code>1)</code>当<code>key</code>的全域*<code>U</code><em>的取值范围<code>0 ~ m</code>很大时，要存储一张大小为<code>m</code>的直接寻址表<code>T</code>可能不切实际；<code>2)</code>待存储的元素个数<code>k</code>可能不多，而<code>key</code>的全域</em><code>U</code>*的取值范围<code>0 ~ m</code>可能很大，这种情况下采用直接寻址表的方式存储性价比低，因为会浪费大量的存储空间。</p>
+<p>相对于直接寻址表，散列表：<code>1)</code>多了一个散列函数(<code>hash function</code>)<code>h(x)</code>，散列函数以元素的<code>key</code>为输入，输出元素存放位置；<code>2)</code>直接寻址表把具有关键字<code>k</code>的元素存放在槽<code>k</code>中，而散列表把它存放在<code>h(k)</code>中，即散列表通过散列函数<code>h(x)</code>把元素映射到散列表*<code>T[0 1, 2 ..., n-1]</code><em>的各个槽(<code>slot</code>)中，因为散列表的映射位置是根据映射函数<code>h(x)</code>计算的，因而散列表的大小<code>n</code>可比全域</em><code>U</code><em>的大小<code>m</code>小得多，而直接寻址表的大小必须和全域</em><code>U</code>*的大小一样大。</p>
+<p>散列表的大小<code>n</code>比*<code>U</code>*的大小<code>m</code>要小，把<code>m</code>个数存入<code>n</code>个槽中(<code>n&lt;=m</code>)，那必然存在<code>2</code>个或多个元素映射到同一个槽中，这就产生了冲突(<code>collision</code>)，因此散列表需要有额外的方式处理冲突，主要有<code>2</code>种：链接法(<code>chaining</code>)和开放寻址法(<code>open addressing</code>)。</p>
+<h2 id="3-2-处理冲突"><a href="#3-2-处理冲突" class="headerlink" title="3.2 处理冲突"></a>3.2 处理冲突</h2><h3 id="3-2-1-链接法"><a href="#3-2-1-链接法" class="headerlink" title="3.2.1 链接法"></a>3.2.1 链接法</h3><h4 id="3-2-1-1-描述"><a href="#3-2-1-1-描述" class="headerlink" title="3.2.1.1 描述"></a>3.2.1.1 描述</h4><p>链接法中散列表存储的是一个指向某个链表的指针，当产生冲突时，直接把数据元素追加到链表的末尾。</p>
+<h4 id="3-2-1-2-性能分析"><a href="#3-2-1-2-性能分析" class="headerlink" title="3.2.1.2 性能分析"></a>3.2.1.2 性能分析</h4><p>看不懂《算法导论》里写的意思，TBC.</p>
+<h5 id="3-2-1-2-1-查找"><a href="#3-2-1-2-1-查找" class="headerlink" title="3.2.1.2.1 查找"></a>3.2.1.2.1 查找</h5><h3 id="3-2-2-开放寻址法"><a href="#3-2-2-开放寻址法" class="headerlink" title="3.2.2 开放寻址法"></a>3.2.2 开放寻址法</h3><h4 id="3-2-2-1-描述"><a href="#3-2-2-1-描述" class="headerlink" title="3.2.2.1 描述"></a>3.2.2.1 描述</h4><h4 id="3-2-2-2-性能分析"><a href="#3-2-2-2-性能分析" class="headerlink" title="3.2.2.2 性能分析"></a>3.2.2.2 性能分析</h4><h2 id="3-3-散列函数"><a href="#3-3-散列函数" class="headerlink" title="3.3 散列函数"></a>3.3 散列函数</h2><p><img src="https://www.kukuxiaai.com/blog/2019-07/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95-%E6%95%A3%E5%88%97%E8%A1%A8/" alt="KuKuXia的散列表介绍"></p>
+]]></content>
+      <categories>
+        <category>algorithm</category>
+      </categories>
+      <tags>
+        <tag>algorithm</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>post</title>
+    <url>/2021/04/27/algorithm/binarySearchTree/binarySearchTree/</url>
+    <content><![CDATA[]]></content>
   </entry>
 </search>
